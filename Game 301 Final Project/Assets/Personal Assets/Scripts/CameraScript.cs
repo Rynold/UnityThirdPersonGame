@@ -8,7 +8,7 @@ public class CameraScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
     {
-        playerCharacter = GameObject.Find("PlayerCharacter");	
+        playerCharacter = GameObject.Find("1st Player");	
 	}
 	
 	// Update is called once per frame

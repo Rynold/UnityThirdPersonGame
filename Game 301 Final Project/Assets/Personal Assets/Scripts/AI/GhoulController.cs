@@ -74,8 +74,12 @@ public class GhoulController : MonoBehaviour {
             Vector3 facing = transform.forward;
             Vector3 velocity = agent.velocity;
 
-            /* gets the vector which describes the characters relative velocity to the direction it is facing */
-            Vector3 animationDirection = Quaternion.AngleAxis(Vector3.Angle(facing, velocity), Vector3.up) * new Vector3(0, 0, 1);
+            /* Gets the vector which describes the characters relative velocity to the direction it is facing
+             * If the velocity is moving towards the right, make sure the angle is negative. */
+            float angle = Vector3.Angle(facing, velocity);
+            if (velocity.x < 0)
+                angle = -angle;
+            Vector3 animationDirection = Quaternion.AngleAxis(angle, Vector3.up) * new Vector3(0, 0, 1);
 
             animator.SetFloat("VelocityX", animationDirection.x);
             animator.SetFloat("VelocityZ", animationDirection.z);
