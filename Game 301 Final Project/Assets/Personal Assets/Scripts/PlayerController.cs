@@ -77,8 +77,6 @@ public class PlayerController : MonoBehaviour
         velocity = LV * m_CamForward + LH * mainCamera.transform.right;
         Vector3 lookDirection = RV * m_CamForward + RH * mainCamera.transform.right;
 
-        Debug.Log("Velocity: " + velocity);
-
         //velocity.Normalize();
         velocity *= speed;
         body.velocity = new Vector3(velocity.x, body.velocity.y, velocity.z);
@@ -97,13 +95,13 @@ public class PlayerController : MonoBehaviour
 
     void FireSpell()
     {
-        Debug.Log("Fire");
-        GameObject spell = Instantiate(fireBall,
-                                       rightHandLocation.position,
-                                       Quaternion.LookRotation(transform.forward,transform.up)) as GameObject;
+            GameObject spell = Instantiate(fireBall,
+                                           rightHandLocation.position,
+                                           Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
 
-        spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject);
+            //spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject);
     }
+
 
     void OnCollisionEnter(Collision collider)
     {

@@ -23,7 +23,7 @@ public class GhoulController : MonoBehaviour {
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
         body = GetComponent<Rigidbody>();
-        playerCharacter = GameObject.Find("PlayerCharacter").transform;
+        playerCharacter = GameObject.Find("1st Player").transform;
         handTrails = GetComponentsInChildren<TrailRenderer>();
         bloodSystems = GetComponentsInChildren<ParticleSystem>();
 
