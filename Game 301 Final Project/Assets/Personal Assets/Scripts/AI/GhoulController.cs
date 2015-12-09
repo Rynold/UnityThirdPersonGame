@@ -17,6 +17,9 @@ public class GhoulController : MonoBehaviour {
     TrailRenderer[] handTrails;
     ParticleSystem[] bloodSystems;
 
+    float maxHealth;
+    float currentHealth;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -36,6 +39,9 @@ public class GhoulController : MonoBehaviour {
         attacking = false;
         isInAir = false;
         JumpVel = 5.0f;
+
+        maxHealth = 100;
+        currentHealth = maxHealth;
 	}
 	
 	// Update is called once per frame

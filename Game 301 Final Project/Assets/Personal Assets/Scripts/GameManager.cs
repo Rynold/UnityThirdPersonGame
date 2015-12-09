@@ -3,12 +3,13 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    GameObject [] spawnLocations;
+    SpawnManger spawner;
 
 	// Use this for initialization
 	void Start () 
     {
-        spawnLocations = GameObject.FindGameObjectsWithTag("Spawn Location");
+        spawner = GetComponent<SpawnManger>();
+        spawner.StartSpawner();
 	}
 	
 	// Update is called once per frame
