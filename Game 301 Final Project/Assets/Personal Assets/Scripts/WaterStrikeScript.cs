@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FireBallScript : MonoBehaviour {
+public class WaterStrikeScript : MonoBehaviour {
 
     GameObject owner;
     Vector3 vel;
@@ -11,13 +11,14 @@ public class FireBallScript : MonoBehaviour {
     float energy;
     float damage;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         lifeTime = 3.0f;
         startTime = Time.realtimeSinceStartup;
         energy = 0;
         damage = 10;
-	}
+    }
 
     public void init(Vector3 velDir, GameObject caster, float _energy)
     {
@@ -25,12 +26,12 @@ public class FireBallScript : MonoBehaviour {
         owner = caster;
         this.energy = _energy;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         gameObject.transform.position += vel;
-	}
+    }
 
     void FixedUpdate()
     {
@@ -44,7 +45,6 @@ public class FireBallScript : MonoBehaviour {
         if (c.gameObject != owner)
         {
             c.GetComponent<GhoulController>().TakeDamage(damage, owner);
-            c.GetComponent<PlayerController>().TakeDamage(damage, owner);
             Destroy(this.gameObject);
         }
     }

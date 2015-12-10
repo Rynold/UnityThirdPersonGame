@@ -20,6 +20,13 @@ public class PlayerController : MonoBehaviour
     public float currentMana;
     private float maxEnergy;
     public float currentEnergy;
+    public float burnedEnergy;
+
+    enum SpellType
+    {
+        Fire,
+        Water
+    }
 
     public float speed;
     float acceleration;
@@ -27,7 +34,10 @@ public class PlayerController : MonoBehaviour
     Vector3 lastVel;
 
     public GameObject fireBall;
+    public GameObject waterStrike;
     UnityEngine.UI.Text healthText;
+    UnityEngine.UI.Text manaText;
+    UnityEngine.UI.Text energyText;
     
 	
 	void Start () 
@@ -42,7 +52,9 @@ public class PlayerController : MonoBehaviour
         maxMana = 100;
         currentMana = maxMana;
         maxEnergy = 100;
-        currentEnergy = 0.0f;
+        currentEnergy = 100.0f;
+        burnedEnergy = 0.0f;
+
         speed = 5.0f;
         acceleration = 0.2f;
         lastVel = new Vector3(0.0f, 0.0f, 0.0f);
@@ -50,6 +62,11 @@ public class PlayerController : MonoBehaviour
 
         healthText = GameObject.Find("Health Text").GetComponent<UnityEngine.UI.Text>();
         healthText.text = "Health: " + currentHealth;
+        manaText = GameObject.Find("Mana Text").GetComponent<UnityEngine.UI.Text>();
+        manaText.text = "Mana: " + currentMana;
+        energyText = GameObject.Find("Energy Text").GetComponent<UnityEngine.UI.Text>();
+        energyText.text = "Energy: " + currentEnergy;
+
         rightHandLocation = GameObject.Find("Right Hand Spell").transform;
 	}
 	
@@ -86,20 +103,74 @@ public class PlayerController : MonoBehaviour
         {
             transform.LookAt(transform.position + lookDirection);
         }
-
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButton("Fire1") || Input.GetButton("Fire2"))
+        {
+            Charge();
+        }
+        if (Input.GetButtonUp("Fire1"))
         {
             animator.SetBool("Attacking", true);
         }
+        if (Input.GetButtonUp("Fire2"))
+        {
+        }
     }
 
-    void FireSpell()
+    void Charge()
     {
-            GameObject spell = Instantiate(fireBall,
-                                           rightHandLocation.position,
-                                           Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+        if (currentEnergy > 0.0)
+        {
+            currentEnergy -= 0.1f;
+            burnedEnergy += 0.1f;
 
-            //spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject);
+            energyText.text = "Energy: " + currentEnergy;
+        }
+    }
+
+    public void AddEnergy(float amount)
+    {
+        currentEnergy += amount;
+        if (currentEnergy > maxEnergy)
+            currentEnergy = maxEnergy;
+
+        energyText.text = "Energy: " + currentEnergy;
+    }
+
+    void FireSpell(SpellType type)
+    {
+        if (currentMana >= 10)
+        {
+            currentMana -= 10;
+            manaText.text = "Mana: " + currentMana;
+
+            GameObject spell;
+
+            switch (type)
+            {
+                case SpellType.Fire:
+                    {
+                        spell = Instantiate(fireBall,
+                                            rightHandLocation.position,
+                                            Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+
+                        spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
+                    }
+                    break;
+                case SpellType.Water:
+                    {
+                        spell = Instantiate(waterStrike,
+                                            rightHandLocation.position,
+                                            Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+
+                        spell.GetComponent<WaterStrikeScript>().init(transform.forward, this.gameObject, burnedEnergy);
+                    }
+                    break;
+            }
+
+            Debug.Log(burnedEnergy);
+            burnedEnergy = 0.0f;
+            energyText.text = "Energy: " + currentEnergy;
+        }
     }
 
 
@@ -107,12 +178,12 @@ public class PlayerController : MonoBehaviour
     {
         switch(collider.transform.tag){
             case "Damages Player" :
-                TakeDamae(10.0f);
+                TakeDamage(10.0f,collider.gameObject);
                 break;
         }
     }
 
-    public void TakeDamae(float damage)
+    public void TakeDamage(float damage, GameObject owner)
     {
         currentHealth -= damage;
         healthText.text = "Health: " + currentHealth;

@@ -99,13 +99,19 @@ public class GhoulController : MonoBehaviour {
 
     void OnCollisionEnter(Collision c)
     {
-        if (c.transform.name == "FireBall(Clone)")
-            TakeDamage();
+        //if (c.transform.name == "FireBall(Clone)")
+        //    ;//TakeDamage();
     }
 
-    void TakeDamage()
+    public void TakeDamage(float amount, GameObject attacker)
     {
-        Destroy(this.gameObject);
+        currentHealth -= amount;
+
+        if (currentHealth <= 0)
+        {
+            attacker.GetComponent<PlayerController>().AddEnergy(10.0f);
+            Destroy(this.gameObject);
+        }
     }
 
     void Attack()
@@ -121,7 +127,7 @@ public class GhoulController : MonoBehaviour {
         foreach (ParticleSystem system in bloodSystems)
             system.Play();
 
-        playerCharacter.GetComponent<PlayerController>().TakeDamae(10.0f);
+        playerCharacter.GetComponent<PlayerController>().TakeDamage(10.0f, this.gameObject);
     }
 
     void CheckGroundStatus()
