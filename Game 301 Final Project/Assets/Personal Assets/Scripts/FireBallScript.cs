@@ -15,15 +15,19 @@ public class FireBallScript : MonoBehaviour {
 	void Start () {
         lifeTime = 3.0f;
         startTime = Time.realtimeSinceStartup;
-        energy = 0;
-        damage = 10;
 	}
 
     public void init(Vector3 velDir, GameObject caster, float _energy)
     {
+        
+        energy = 0;
+        damage = 10;
+
         vel = velDir * speed;
         owner = caster;
         this.energy = _energy;
+
+        damage += _energy;
     }
 	
 	// Update is called once per frame
@@ -44,7 +48,7 @@ public class FireBallScript : MonoBehaviour {
         if (c.gameObject != owner)
         {
             c.GetComponent<GhoulController>().TakeDamage(damage, owner);
-            c.GetComponent<PlayerController>().TakeDamage(damage, owner);
+            //c.GetComponent<PlayerController>().TakeDamage(damage, owner);
             Destroy(this.gameObject);
         }
     }

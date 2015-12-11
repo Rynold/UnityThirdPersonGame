@@ -22,6 +22,10 @@ public class PlayerController : MonoBehaviour
     public float currentEnergy;
     public float burnedEnergy;
 
+    float manaRechargeTimer;
+    float timeLastAbilityUse;
+    
+
     enum SpellType
     {
         Fire,
@@ -38,6 +42,8 @@ public class PlayerController : MonoBehaviour
     UnityEngine.UI.Text healthText;
     UnityEngine.UI.Text manaText;
     UnityEngine.UI.Text energyText;
+    UnityEngine.UI.Text burnedEnergyText;
+    SpellType currentSpellType;
     
 	
 	void Start () 
@@ -55,6 +61,9 @@ public class PlayerController : MonoBehaviour
         currentEnergy = 100.0f;
         burnedEnergy = 0.0f;
 
+        manaRechargeTimer = 2.0f;
+        timeLastAbilityUse = 0.0f;
+
         speed = 5.0f;
         acceleration = 0.2f;
         lastVel = new Vector3(0.0f, 0.0f, 0.0f);
@@ -66,9 +75,16 @@ public class PlayerController : MonoBehaviour
         manaText.text = "Mana: " + currentMana;
         energyText = GameObject.Find("Energy Text").GetComponent<UnityEngine.UI.Text>();
         energyText.text = "Energy: " + currentEnergy;
+        burnedEnergyText = GameObject.Find("Burned Energy Text").GetComponent<UnityEngine.UI.Text>();
+        burnedEnergyText.text = "Energy: " + currentEnergy;
 
+<<<<<<< HEAD
         //rightHandLocation = GameObject.Find("Right Hand Spell").transform;
         rightHandLocation = transform.Find("Right Hand Spell");
+=======
+        rightHandLocation = GameObject.Find("Right Hand Spell").transform;
+        currentSpellType = SpellType.Fire;
+>>>>>>> 47aec44f1333cdd8be95b6bad1d8ab29973acf2a
 	}
 	
 	
@@ -81,6 +97,27 @@ public class PlayerController : MonoBehaviour
     {
         HandleInput();
         UpdateAnimator();
+
+
+        if (CheckManaRecharge())
+        {
+            currentMana += 0.25f;
+            manaText.text = "Mana: " + Mathf.Floor(currentMana);
+        }
+        if (burnedEnergy > 2)
+            rightHandLocation.GetComponent<ParticleSystem>().emissionRate = burnedEnergy;
+        else
+            rightHandLocation.GetComponent<ParticleSystem>().emissionRate = 2;
+    }
+
+    bool CheckManaRecharge()
+    {
+        if (currentMana >= maxMana)
+            return false;
+        else if (timeLastAbilityUse + manaRechargeTimer <= Time.timeSinceLevelLoad)
+            return true;
+        else
+            return false;
     }
 
     void HandleInput()
@@ -110,10 +147,13 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetButtonUp("Fire1"))
         {
-            animator.SetBool("Attacking", true);
+            animator.SetBool("Fire Attack", true);
+            currentSpellType = SpellType.Fire;
         }
         if (Input.GetButtonUp("Fire2"))
         {
+            animator.SetBool("Ice Attack", true);
+            currentSpellType = SpellType.Water;
         }
     }
 
@@ -121,10 +161,10 @@ public class PlayerController : MonoBehaviour
     {
         if (currentEnergy > 0.0)
         {
-            currentEnergy -= 0.1f;
-            burnedEnergy += 0.1f;
+            if(burnedEnergy < currentEnergy)
+                burnedEnergy += 0.25f;
 
-            energyText.text = "Energy: " + currentEnergy;
+            burnedEnergyText.text = "Burned: " + Mathf.Floor(burnedEnergy);
         }
     }
 
@@ -137,16 +177,16 @@ public class PlayerController : MonoBehaviour
         energyText.text = "Energy: " + currentEnergy;
     }
 
-    void FireSpell(SpellType type)
+    void FireSpell()
     {
         if (currentMana >= 10)
         {
             currentMana -= 10;
-            manaText.text = "Mana: " + currentMana;
+            manaText.text = "Mana: " + Mathf.Floor(currentMana);
 
             GameObject spell;
 
-            switch (type)
+            switch (currentSpellType)
             {
                 case SpellType.Fire:
                     {
@@ -163,17 +203,19 @@ public class PlayerController : MonoBehaviour
                                             rightHandLocation.position,
                                             Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
 
-                        spell.GetComponent<WaterStrikeScript>().init(transform.forward, this.gameObject, burnedEnergy);
+                        spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
                     }
                     break;
             }
 
             Debug.Log(burnedEnergy);
+            currentEnergy -= burnedEnergy;
             burnedEnergy = 0.0f;
-            energyText.text = "Energy: " + currentEnergy;
+            energyText.text = "Energy: " + Mathf.Floor(currentEnergy);
+            burnedEnergyText.text = "Burned: " + Mathf.Floor(burnedEnergy);
+            timeLastAbilityUse = Time.timeSinceLevelLoad;
         }
     }
-
 
     void OnCollisionEnter(Collision collider)
     {
@@ -214,5 +256,13 @@ public class PlayerController : MonoBehaviour
         }
 
 
+    }
+
+    public void AddHealth(float amount)
+    {
+        currentHealth += amount;
+
+        if (currentHealth >= maxHealth)
+            currentHealth = maxHealth;
     }
 }

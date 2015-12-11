@@ -13,6 +13,7 @@ public class GhoulController : MonoBehaviour {
     public bool attacking;
     public bool isInAir;
     float JumpVel;
+    bool canDamage;
 
     TrailRenderer[] handTrails;
     ParticleSystem[] bloodSystems;
@@ -23,6 +24,7 @@ public class GhoulController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
     {
+        canDamage = false;
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
         body = GetComponent<Rigidbody>();
@@ -40,7 +42,7 @@ public class GhoulController : MonoBehaviour {
         isInAir = false;
         JumpVel = 5.0f;
 
-        maxHealth = 100;
+        maxHealth = 25;
         currentHealth = maxHealth;
 	}
 	
@@ -105,11 +107,12 @@ public class GhoulController : MonoBehaviour {
 
     public void TakeDamage(float amount, GameObject attacker)
     {
+        Debug.Log("Ghoul take damage");
         currentHealth -= amount;
 
         if (currentHealth <= 0)
         {
-            attacker.GetComponent<PlayerController>().AddEnergy(10.0f);
+            attacker.GetComponent<PlayerController>().AddEnergy(25.0f);
             Destroy(this.gameObject);
         }
     }
@@ -122,12 +125,23 @@ public class GhoulController : MonoBehaviour {
 
     void DealDamage()
     {
-        Debug.Log("Dealing Damage");
-
         foreach (ParticleSystem system in bloodSystems)
             system.Play();
 
-        playerCharacter.GetComponent<PlayerController>().TakeDamage(10.0f, this.gameObject);
+        if(canDamage)
+            playerCharacter.GetComponent<PlayerController>().TakeDamage(10.0f, this.gameObject);
+    }
+
+    void OnTriggerEnter(Collider c)
+    {
+        if (c = playerCharacter.GetComponent<Collider>())
+            canDamage = true;
+    }
+
+    void OnTriggerExit(Collider c)
+    {
+        if (c = playerCharacter.GetComponent<Collider>())
+            canDamage = false;
     }
 
     void CheckGroundStatus()

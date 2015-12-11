@@ -1,11 +1,12 @@
 fileFormatVersion: 2
 guid: 78eb358ec2ff6b8438a393da9c865fd3
-timeCreated: 1444358969
+timeCreated: 1449786067
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - fireBall: {fileID: 100008, guid: 8d2641fc70e1ece46ab2a5c2be8f772a, type: 2}
+  - waterStrike: {fileID: 122624, guid: b3cd33b3c2d804347b28ba772a9d7f4d, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

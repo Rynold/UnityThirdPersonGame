@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
     {
         spawner = GetComponent<SpawnManger>();
         spawner.StartSpawner();
+        
 	}
 	
 	// Update is called once per frame
