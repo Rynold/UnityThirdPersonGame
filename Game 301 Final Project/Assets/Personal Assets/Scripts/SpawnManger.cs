@@ -5,13 +5,12 @@ public class SpawnManger : MonoBehaviour {
 
     public Transform enemiePrefab;
     GameObject[] spawnLocations;
-    bool isSpawning;
+    bool isSpawning = false;
     float timeBetweenSpawns;
     float lastSpawnTime;
 
 	// Use this for initialization
 	void Start () {
-        isSpawning = false;
         timeBetweenSpawns = 5.0f;
         lastSpawnTime = 0.0f;
 
@@ -25,6 +24,8 @@ public class SpawnManger : MonoBehaviour {
         {
             if (lastSpawnTime + timeBetweenSpawns <= Time.timeSinceLevelLoad)
             {
+                Debug.Log("Spawning");
+
                 SpawnEnemie();
                 lastSpawnTime = Time.timeSinceLevelLoad;
             }
@@ -39,10 +40,12 @@ public class SpawnManger : MonoBehaviour {
     public void StartSpawner()
     {
         isSpawning = true;
+        Debug.Log("Spawner Started");
     }
 
     public void StopSpawner()
     {
         isSpawning = false;
+        Debug.Log("Stop Spawning Called");
     }
 }
