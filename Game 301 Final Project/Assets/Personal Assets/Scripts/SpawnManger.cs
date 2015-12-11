@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class SpawnManger : MonoBehaviour {
+public class SpawnManger : NetworkBehaviour {
 
     public Transform enemiePrefab;
     GameObject[] spawnLocations;
@@ -26,15 +27,17 @@ public class SpawnManger : MonoBehaviour {
             {
                 Debug.Log("Spawning");
 
-                SpawnEnemie();
+                CmdSpawnEnemie();
                 lastSpawnTime = Time.timeSinceLevelLoad;
             }
         }
 	}
 
-    void SpawnEnemie()
+    [Command]
+    void CmdSpawnEnemie()
     {
-        Instantiate(enemiePrefab,spawnLocations[Random.Range(0, spawnLocations.GetLength(0))].transform.position,Quaternion.identity);
+        GameObject enemy = Instantiate(enemiePrefab,spawnLocations[Random.Range(0, spawnLocations.GetLength(0))].transform.position,Quaternion.identity) as GameObject;
+        NetworkServer.Spawn(enemy);
     }
 
     public void StartSpawner()

@@ -19,7 +19,7 @@ public class FireBallScript : MonoBehaviour {
 
     public void init(Vector3 velDir, GameObject caster, float _energy)
     {
-        
+        Debug.Log("We are here");
         energy = 0;
         damage = 10;
 

@@ -2,17 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.Networking;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
-public class PlayerController : MonoBehaviour 
+public class PlayerController : NetworkBehaviour 
 {
     GameManager gm;
     Animator animator;
     Rigidbody body;
     GameObject mainCamera;
     Transform rightHandLocation;
+    Vector3 spellSpawnPosition;
 
     private float maxHealth;
     public float currentHealth;
@@ -78,13 +80,11 @@ public class PlayerController : MonoBehaviour
         burnedEnergyText = GameObject.Find("Burned Energy Text").GetComponent<UnityEngine.UI.Text>();
         burnedEnergyText.text = "Energy: " + currentEnergy;
 
-<<<<<<< HEAD
         //rightHandLocation = GameObject.Find("Right Hand Spell").transform;
-        rightHandLocation = transform.Find("Right Hand Spell");
-=======
+        //rightHandLocation = transform.Find("Right Hand Spell");
+
         rightHandLocation = GameObject.Find("Right Hand Spell").transform;
         currentSpellType = SpellType.Fire;
->>>>>>> 47aec44f1333cdd8be95b6bad1d8ab29973acf2a
 	}
 	
 	
@@ -177,33 +177,45 @@ public class PlayerController : MonoBehaviour
         energyText.text = "Energy: " + currentEnergy;
     }
 
+    
     void FireSpell()
     {
+        Debug.Log("fire spell");
         if (currentMana >= 10)
         {
+            Debug.Log("mana fine");
             currentMana -= 10;
             manaText.text = "Mana: " + Mathf.Floor(currentMana);
 
             GameObject spell;
 
+            spellSpawnPosition = transform.position;
+            spellSpawnPosition.y += 1;
+
             switch (currentSpellType)
             {
                 case SpellType.Fire:
                     {
-                        spell = Instantiate(fireBall,
-                                            rightHandLocation.position,
-                                            Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+                        Debug.Log("type fire");
+                        CmdSpawnFireBall(spellSpawnPosition);
+                        //spell = Instantiate(fireBall,
+                        //                    spellSpawnPosition,//rightHandLocation.position,
+                        //                    Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+                        ////Debug.Log("should have spawned");
 
-                        spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
+                        //spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
+                        //NetworkServer.Spawn(spell);
                     }
                     break;
                 case SpellType.Water:
                     {
+                        Debug.Log("type water");
                         spell = Instantiate(waterStrike,
-                                            rightHandLocation.position,
+                                            spellSpawnPosition,//rightHandLocation.position,
                                             Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
 
                         spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
+                        NetworkServer.Spawn(spell);
                     }
                     break;
             }
@@ -215,6 +227,19 @@ public class PlayerController : MonoBehaviour
             burnedEnergyText.text = "Burned: " + Mathf.Floor(burnedEnergy);
             timeLastAbilityUse = Time.timeSinceLevelLoad;
         }
+    }
+
+    [Command]
+    void CmdSpawnFireBall(Vector3 pos)
+    {
+        GameObject spell;
+        spell = Instantiate(fireBall,
+                                            pos,//rightHandLocation.position,
+                                            Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+        //Debug.Log("should have spawned");
+
+        spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
+        NetworkServer.Spawn(spell);
     }
 
     void OnCollisionEnter(Collision collider)
