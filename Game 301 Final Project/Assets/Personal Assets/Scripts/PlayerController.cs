@@ -67,7 +67,8 @@ public class PlayerController : MonoBehaviour
         energyText = GameObject.Find("Energy Text").GetComponent<UnityEngine.UI.Text>();
         energyText.text = "Energy: " + currentEnergy;
 
-        rightHandLocation = GameObject.Find("Right Hand Spell").transform;
+        //rightHandLocation = GameObject.Find("Right Hand Spell").transform;
+        rightHandLocation = transform.Find("Right Hand Spell");
 	}
 	
 	
