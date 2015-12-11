@@ -12,7 +12,8 @@ public class PlayerController : NetworkBehaviour
     GameManager gm;
     Animator animator;
     Rigidbody body;
-    GameObject mainCamera;
+    public GameObject mainCamera;
+    Transform cameraTransform;
     Transform rightHandLocation;
     Vector3 spellSpawnPosition;
 
@@ -53,7 +54,11 @@ public class PlayerController : NetworkBehaviour
         animator = GetComponent<Animator>();
         animator.applyRootMotion = false;
         body = GetComponent<Rigidbody>();
-        mainCamera = GameObject.Find("Main Camera");
+        mainCamera = Instantiate(mainCamera,transform.position,Quaternion.Euler(new Vector3(0.0f,45f,40f))) as GameObject;
+        mainCamera.gameObject.GetComponent<CameraScript>().init(this.gameObject);
+
+        cameraTransform = mainCamera.transform.FindChild("Camera Arm").FindChild("Main Camera");
+        //transform.FindChild("Camera").gameObject;
 
         maxHealth = 100;
         currentHealth = maxHealth;
@@ -80,11 +85,11 @@ public class PlayerController : NetworkBehaviour
         burnedEnergyText = GameObject.Find("Burned Energy Text").GetComponent<UnityEngine.UI.Text>();
         burnedEnergyText.text = "Energy: " + currentEnergy;
 
-        //rightHandLocation = GameObject.Find("Right Hand Spell").transform;
-        //rightHandLocation = transform.Find("Right Hand Spell");
+        rightHandLocation = transform.FindChild("Right Hand Spell");
 
-        rightHandLocation = GameObject.Find("Right Hand Spell").transform;
         currentSpellType = SpellType.Fire;
+
+        //GameObject.Find("Game Manager").GetComponent<SpawnManger>().AddPlayer(gameObject);
 	}
 	
 	
@@ -104,10 +109,10 @@ public class PlayerController : NetworkBehaviour
             currentMana += 0.25f;
             manaText.text = "Mana: " + Mathf.Floor(currentMana);
         }
-        if (burnedEnergy > 2)
-            rightHandLocation.GetComponent<ParticleSystem>().emissionRate = burnedEnergy;
-        else
-            rightHandLocation.GetComponent<ParticleSystem>().emissionRate = 2;
+        //if (burnedEnergy > 2)
+        //    rightHandLocation.GetComponent<ParticleSystem>().emissionRate = burnedEnergy;
+        //else
+        //    rightHandLocation.GetComponent<ParticleSystem>().emissionRate = 2;
     }
 
     bool CheckManaRecharge()
@@ -128,9 +133,9 @@ public class PlayerController : NetworkBehaviour
         float RH = Input.GetAxis("RightH");
         float RV = Input.GetAxis("RightV");
 
-        Vector3 m_CamForward = Vector3.Scale(mainCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
-        velocity = LV * m_CamForward + LH * mainCamera.transform.right;
-        Vector3 lookDirection = RV * m_CamForward + RH * mainCamera.transform.right;
+        Vector3 m_CamForward = Vector3.Scale(cameraTransform.transform.forward, new Vector3(1, 0, 1)).normalized;
+        velocity = LV * m_CamForward + LH * cameraTransform.transform.right;
+        Vector3 lookDirection = RV * m_CamForward + RH * cameraTransform.transform.right;
 
         //velocity.Normalize();
         velocity *= speed;
@@ -187,10 +192,11 @@ public class PlayerController : NetworkBehaviour
             currentMana -= 10;
             manaText.text = "Mana: " + Mathf.Floor(currentMana);
 
-            GameObject spell;
+
 
             spellSpawnPosition = transform.position;
             spellSpawnPosition.y += 1;
+            //spellSpawnPosition = rightHandLocation.position;
 
             switch (currentSpellType)
             {
@@ -210,12 +216,13 @@ public class PlayerController : NetworkBehaviour
                 case SpellType.Water:
                     {
                         Debug.Log("type water");
-                        spell = Instantiate(waterStrike,
-                                            spellSpawnPosition,//rightHandLocation.position,
-                                            Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+                        CmdSpawnWaterStrike(spellSpawnPosition);
+                        //spell = Instantiate(waterStrike,
+                        //                    spellSpawnPosition,//rightHandLocation.position,
+                        //                    Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
 
-                        spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
-                        NetworkServer.Spawn(spell);
+                        //spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
+                        //NetworkServer.Spawn(spell);
                     }
                     break;
             }
@@ -234,6 +241,19 @@ public class PlayerController : NetworkBehaviour
     {
         GameObject spell;
         spell = Instantiate(fireBall,
+                                            pos,//rightHandLocation.position,
+                                            Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
+        //Debug.Log("should have spawned");
+
+        spell.GetComponent<FireBallScript>().init(transform.forward, this.gameObject, burnedEnergy);
+        NetworkServer.Spawn(spell);
+    }
+
+    [Command]
+    void CmdSpawnWaterStrike(Vector3 pos)
+    {
+        GameObject spell;
+        spell = Instantiate(waterStrike,
                                             pos,//rightHandLocation.position,
                                             Quaternion.LookRotation(transform.forward, transform.up)) as GameObject;
         //Debug.Log("should have spawned");

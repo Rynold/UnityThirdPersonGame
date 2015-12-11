@@ -9,7 +9,7 @@ public class GhoulController : MonoBehaviour {
     Animator animator;
     NavMeshAgent agent;
     Rigidbody body;
-    public Transform playerCharacter;
+    Transform playerCharacter;
     public bool attacking;
     public bool isInAir;
     float JumpVel;
@@ -28,7 +28,10 @@ public class GhoulController : MonoBehaviour {
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
         body = GetComponent<Rigidbody>();
-        playerCharacter = GameObject.Find("1st Player").transform;
+        
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        playerCharacter = players[Random.Range(0,players.Length)].transform;
+
         handTrails = GetComponentsInChildren<TrailRenderer>();
         bloodSystems = GetComponentsInChildren<ParticleSystem>();
 
@@ -44,8 +47,15 @@ public class GhoulController : MonoBehaviour {
 
         maxHealth = 25;
         currentHealth = maxHealth;
+
+        Debug.Log("Alive");
 	}
-	
+
+    public void Init(GameObject player)
+    {
+        Debug.Log("Blah");
+        playerCharacter = player.transform;
+    }
 	// Update is called once per frame
 	void Update ()
     {

@@ -11,7 +11,7 @@ public class PlayerNetworkSetup : NetworkBehaviour {
     void Start () {
 	    if (isLocalPlayer)
         {
-            playersCamera.SetActive(true);
+            //playersCamera.SetActive(true);
             GetComponent<PlayerController>().enabled = true;
         }
 	}
